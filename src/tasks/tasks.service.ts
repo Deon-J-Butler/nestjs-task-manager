@@ -13,32 +13,8 @@ export class TasksService {
     private tasksRepository: TasksRepository,
   ) {}
 
-  async getAllTasks(): Promise<TasksRepository> {
-    return this.tasksRepository;
-  }
-
-  async getTasksWithFilters(
-    filterDto: GetTasksFilterDto,
-  ): Promise<TasksRepository> {
-    const { status, search } = filterDto;
-    let tasks = await this.getAllTasks();
-
-    if (status) {
-      tasks = tasks.filter((task) => tasks.status === status);
-    }
-
-    if (search) {
-      tasks = tasks.filter((task) => {
-        if (
-          task.name.toLowerCase().includes(search) ||
-          task.description.toLowerCase().includes(search)
-        ) {
-          return true;
-        }
-        return false;
-      });
-    }
-    return tasks;
+  getTasks(filterDto: GetTasksFilterDto): Promise<Task[]> {
+    return this.tasksRepository.getTasks(filterDto);
   }
 
   async getTaskById(id: string): Promise<Task> {
@@ -55,32 +31,29 @@ export class TasksService {
     return task;
   }
 
-  async createTask(createTaskDto: CreateTaskDto): Promise<Task> {
-    const { title, description } = createTaskDto;
-
-    const task = this.tasksRepository.create({
-      title,
-      description,
-      status: TaskStatus.OPEN,
-    });
-
-    await this.tasksRepository.save(task);
-    return task;
+  createTask(createTaskDto: CreateTaskDto): Promise<Task> {
+    return this.tasksRepository.createTask(createTaskDto);
   }
 
   async deleteTask(id: string): Promise<void> {
-    await this.tasksRepository.delete(id);
+    const target = await this.tasksRepository.delete(id);
+
+    if (target.affected === 0) {
+      throw new NotFoundException(`Task ${id} not found`);
+    }
   }
 
   async updateTaskStatus(id: string, status: TaskStatus): Promise<Task> {
     const task = await this.getTaskById(id);
     task.status = status;
+    await this.tasksRepository.save(task);
     return task;
   }
 
   async updateTaskDescription(id: string, description: string): Promise<Task> {
     const task = await this.getTaskById(id);
     task.description = description;
+    await this.tasksRepository.save(task);
     return task;
   }
 }
