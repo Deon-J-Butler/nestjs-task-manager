@@ -1,17 +1,6 @@
 version: '3'
 
 services:
-  # node:
-  #   build: ./src
-  #   depends_on:
-  #     - postgres
-  #   environment:
-  #     - POSTGRES_HOST=postgres
-  #   ports:
-  #     - 8000:4200
-  #   volumes:
-  #     - ./src:/home/node/app/src
-  #     - ./tsconfig.json:/home/node/app/tsconfig.json
   postgres:
     container_name: postgres_nest
     image: postgres
