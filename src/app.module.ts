@@ -11,7 +11,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
   imports: [
     AuthModule,
     TasksModule,
-    ConfigModule.forRoot({}),
+    ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
