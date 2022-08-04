@@ -1,3 +1,4 @@
+import { InternalServerErrorException, Logger } from '@nestjs/common';
 import { User } from 'src/auth/user.entity';
 import { Repository } from 'typeorm';
 import { CustomRepository } from '../database/typeorm-ex.decorator';
@@ -8,6 +9,8 @@ import { Task } from './task.entity';
 
 @CustomRepository(Task)
 export class TasksRepository extends Repository<Task> {
+  private logger = new Logger();
+
   async getTasks(filterDto: GetTasksFilterDto, user: User): Promise<Task[]> {
     const { status, search } = filterDto;
     const query = this.createQueryBuilder('task');
@@ -24,8 +27,13 @@ export class TasksRepository extends Repository<Task> {
       );
     }
 
-    const tasks = await query.getMany();
-    return tasks;
+    try {
+      const tasks = await query.getMany();
+      return tasks;
+    } catch (e) {
+      this.logger.error(`There was an error getting tasks:`, e.stack);
+      throw new InternalServerErrorException();
+    }
   }
 
   async createTask(createTaskDto: CreateTaskDto, user: User): Promise<Task> {
