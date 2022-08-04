@@ -1,3 +1,4 @@
+import { Exclude } from 'class-transformer';
 import { User } from 'src/auth/user.entity';
 import {
   BaseEntity,
@@ -18,6 +19,8 @@ export class Task extends BaseEntity {
   description: string;
   @Column()
   status: TaskStatus;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   @ManyToOne((_type) => User, (user) => user.tasks, { eager: false })
+  @Exclude({ toPlainOnly: true })
   user: User;
 }
