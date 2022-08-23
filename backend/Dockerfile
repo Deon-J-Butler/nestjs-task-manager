@@ -1,19 +1,14 @@
-FROM postgres
-
 FROM node:16
-
-WORKDIR /app
-
-COPY package.json package-lock.json ./
-COPY tsconfig.json ./
-
-RUN chown node:node -R ./
-USER node
-
-RUN npm install --no-optional && npm cache clean --force
-
+ARG NODE_ENV=development
+ENV NODE_ENV $NODE_ENV
 ARG PORT=4200
 ENV PORT $PORT
-EXPOSE $PORT
+EXPOSE $PORT 9229 9230
 
-CMD ["npm", "run", "start", "dev"]
+WORKDIR ./home/node/app
+COPY package.json yarn.lock ./
+COPY tsconfig.json ./
+RUN chown node:node -R ./
+USER node
+RUN npm install --omit=optional && npm cache clean --force
+CMD ["npm", "run", "dev"]

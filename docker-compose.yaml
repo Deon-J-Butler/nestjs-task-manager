@@ -1,43 +1,41 @@
 version: "3"
 
+networks:
+  task-manager:
+
+volumes:
+  app_data: {}
+
 services:
+
   node:
     build: ./backend
     depends_on:
       - postgres
-    environment:
-      - POSTGRES_HOST=postgres
     volumes:
-      - ./backend/src:/home/node/app/src
-      - ./backend/tsconfig.json:/home/node/app/tsconfig.json
+        - ./backend/src:/home/node/app/src
+        - ./backend/tsconfig.json:/home/node/app/tsconfig.json
     ports:
       - 8080:4200
-    restart: unless-stopped
+    networks:
+      - task-manager
 
   postgres:
-    container_name: postgres_nest
     image: postgres
-    environment:
-      - POSTGRES_USER=${DATABASE_USER}
-      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
-      - POSTGRES_DB=${DATABASE_NAME}
-      - POSTGRES_HOST=${DATABASE_HOST}
+    env_file:
+      - ./.env
     volumes:
-      - pg-dataset:/var/lib/postgresql/data
+      - ./postgres/:/etc/postgres/
     ports:
-      - ${DATABASE_PORT}:${DATABASE_PORT}
-    restart: unless-stopped
+      - 5432:5432
+    networks:
+      - task-manager
 
   app:
     build: ./frontend
-    depends_on:
-      - node
-    ports:
-      - 80:80
     volumes:
-      - ./frontend/nginx.conf:/etc/nginx/conf.d/default.conf
-      - ./frontend/public:/usr/share/nginx/html
-    restart: unless-stopped
-volumes:
-  compose-lesson:
-  pg-dataset:
+      - app_data:/var/log
+    ports:
+      - 8081:80
+    networks:
+      - task-manager

@@ -1,6 +1,6 @@
 FROM node:16 as build-stage
 COPY ./ ./
-RUN npm install --no-optional && npm cache clean --force
+RUN npm install
 RUN npm run build
 
 FROM nginx:1.15
