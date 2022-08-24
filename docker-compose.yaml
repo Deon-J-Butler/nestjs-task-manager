@@ -22,20 +22,21 @@ services:
 
   postgres:
     image: postgres
-    env_file:
-      - ./.env
-    volumes:
-      - ./postgres/:/etc/postgres/
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=task-manager
+      - POSTGRES_HOST=0.0.0.0
     ports:
       - 5432:5432
     networks:
       - task-manager
 
-  app:
-    build: ./frontend
-    volumes:
-      - app_data:/var/log
-    ports:
-      - 8081:80
-    networks:
-      - task-manager
+  # app:
+  #   build: ./frontend
+  #   volumes:
+  #     - app_data:/var/log
+  #   ports:
+  #     - 8081:80
+  #   networks:
+  #     - task-manager
